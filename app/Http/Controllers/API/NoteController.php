@@ -68,9 +68,11 @@ class NoteController extends Controller
     /**
      * @param $id
      * @return JsonResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function show(Note $note)
     {
+        $this->authorize('view', $note);
         if (is_null($note)) {
             return response()->json('Data not found', 404);
         }
@@ -84,6 +86,7 @@ class NoteController extends Controller
      */
     public function update(Request $request, Note $note)
     {
+        $this->authorize('update', $note);
         $validator = Validator::make($request->all(),[
             'note' => 'required|string|max:1000',
             'title' => 'required|string|max:50',
@@ -92,6 +95,8 @@ class NoteController extends Controller
         if($validator->fails()){
             return response()->json($validator->errors());
         }
+
+
 
         $note->title = $request->title;
         $note->note = $request->note;
@@ -106,6 +111,7 @@ class NoteController extends Controller
      */
     public function destroy(Note $note)
     {
+        $this->authorize('delete', $note);
         $note->delete();
 
         return response()->json('Note deleted successfully');
